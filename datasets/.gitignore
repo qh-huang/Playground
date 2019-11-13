@@ -1,0 +1,7 @@
+# ignore everything in this folder
+/*
+# only keep download scripts in version control
+!*.py
+!*.sh
+!.gitignore
+
