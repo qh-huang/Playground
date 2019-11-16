@@ -1,6 +1,6 @@
 project(opencv_samples)
 
-find_package(OpenCV 4 REQUIRED)
+find_package(OpenCV REQUIRED)
 
 # Fix error "OpenCV 4.x+ requires enabled C++11 support"
 if(CMAKE_VERSION VERSION_LESS "3.1")
@@ -11,6 +11,7 @@ else()
   set(CMAKE_CXX_STANDARD 11)
 endif()
 
+include_directories(${OpenCV_INCLUDE_DIRS})
 
 add_executable(app_zoom src/app_zoom_main.cc)
 target_link_libraries(app_zoom ${OpenCV_LIBS})
