@@ -25,3 +25,6 @@
 [submodule "awesome_lists/awesome-cpp"]
 	path = awesome_lists/awesome-cpp
 	url = git@github.com:fffaraz/awesome-cpp.git
+[submodule "awesome_lists/awesome-modern-cpp"]
+	path = awesome_lists/awesome-modern-cpp
+	url = git@github.com:rigtorp/awesome-modern-cpp.git
