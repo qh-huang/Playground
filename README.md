@@ -1,2 +1,2 @@
-# Coding-Samples-for-Robotics-and-Computer-Vision
-Coding Samples for Robotics and Computer Vision
+# Playground
+Coding samples, practices, experiments, and tools for my work and hobbies.
