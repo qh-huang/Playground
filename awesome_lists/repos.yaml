@@ -1,0 +1,43 @@
+# This file collects repositories to download
+
+- git:
+    local-name: awesome-3d-reconstruction
+    uri: git@github.com:openMVG/awesome_3DReconstruction_list.git
+    version: master
+- git:
+    local-name: awesome-computer-vision
+    uri: git@github.com:jbhuang0604/awesome-computer-vision.git
+    version: master
+- git:
+    local-name: awesome-cpp
+    uri: git@github.com:fffaraz/awesome-cpp.git
+    version: master
+- git:
+    local-name: awesome-modern-cpp
+    uri: git@github.com:rigtorp/awesome-modern-cpp.git
+    version: master
+- git:
+    local-name: awesome-robotic-tooling
+    uri: git@github.com:Ly0n/awesome-robotic-tooling.git
+    version: master
+- git:
+    local-name: awesome-robotics
+    uri: git@github.com:ahundt/awesome-robotics.git
+    version: master
+- git:
+    local-name: awesome-robotics-libraries
+    uri: git@github.com:jslee02/awesome-robotics-libraries.git
+    version: master
+- git:
+    local-name: awesome-ros2
+    uri: git@github.com:fkromer/awesome-ros2.git
+    version: master
+- git:
+    local-name: awesome-slam-datasets
+    uri: git@github.com:youngguncho/awesome-slam-datasets.git
+    version: master
+- git:
+    local-name: awesome-visual-slam
+    uri: git@github.com:qiao-tw/awesome-visual-slam.git
+    version: master
+    
