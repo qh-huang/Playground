@@ -10,3 +10,5 @@ for f in repos.yaml ; do
   vcs-import --input ${f} .;
 done
 
+# update all repositories
+find . -type d -name .git -exec git --git-dir={} --work-tree=$PWD/{}/.. pull --verbose \;
