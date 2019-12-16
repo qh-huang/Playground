@@ -40,4 +40,11 @@
     local-name: awesome-visual-slam
     uri: git@github.com:qiao-tw/awesome-visual-slam.git
     version: master
-    
+- git:
+    local-name: awesome-drones
+    uri: git@github.com:qiao-tw/awesome-drones.git
+    version: master
+- git:
+    local-name: awesome-drone
+    uri: git@github.com:Pana/awesome-drone.git
+    version: master
