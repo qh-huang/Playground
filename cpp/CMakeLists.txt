@@ -13,3 +13,4 @@ endif()
 include_directories(include)
 
 add_executable(app_main app_main.cc)
+add_executable(utils_main utils_main.cc)
