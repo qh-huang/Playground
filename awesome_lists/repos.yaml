@@ -48,3 +48,7 @@
     local-name: awesome-drone
     uri: git@github.com:Pana/awesome-drone.git
     version: master
+- git:
+    local-name: awesome-uav
+    uri: git@github.com:qiao-tw/awesome-uav.git
+    version: master
