@@ -1,4 +1,4 @@
-project(coding_samples)
+project(playground)
 cmake_minimum_required(VERSION 3.10)
 
 add_subdirectory(cmake_samples)
