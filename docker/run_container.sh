@@ -76,11 +76,19 @@ function prepare_docker_run_params() {
       ;;
 
     Linux)
+      # Prepare target env
+      CONTAINER_DISPLAY="0"
+      # Get the DISPLAY slot
+      DISPLAY_NUMBER=$(echo $DISPLAY | cut -d. -f1 | cut -d: -f2)
+      # Extract current authentication cookie
+      AUTH_COOKIE=$(xauth list | grep "^$(hostname)/unix:${DISPLAY_NUMBER} " | awk '{print $3}')
+
+# Launch the container
       DOCKER_RUN_PARAMETER_LIST="-it \
         --name=$CONTAINER_NAME \
         --tmpfs /tmp:exec \
         -h docker \
-        -e DISPLAY=host.docker.internal:0 \
+        -e DISPLAY=:${CONTAINER_DISPLAY} \
         -e QT_X11_NO_MITSHM=1 \
         -e XAUTHORITY=$XAUTH \
         -v /dataset:/dataset \
@@ -98,7 +106,7 @@ function prepare_docker_run_params() {
         --rm ${IMAGE_NAME} \
         /bin/bash"
         #-e XAUTHORITY=$XAUTH \
-        #-v "$WORKSPACE_DIR":/home/gpal \
+        #-e DISPLAY=host.docker.internal:0 \        #-v "$WORKSPACE_DIR":/home/gpal \
         #-v /etc/localtime:/etc/localtime:ro \
         #-v /run/udev:/run/udev:ro \
       ;;
