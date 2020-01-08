@@ -120,6 +120,11 @@ then
   docker start $CONTAINER_NAME
   docker attach $CONTAINER_NAME
 else
+  case "$(uname -s)" in
+    Darwin)
+      init_x11
+      ;;
+  esac
   prepare_docker_run_params
   echo $DOCKER_RUN_PARAMETER_LIST
   docker run $DOCKER_RUN_PARAMETER_LIST
