@@ -60,3 +60,15 @@
       local-name: awesome-android
       uri: git@github.com:JStumpp/awesome-android.git
       version: master
+- git:
+      local-name: awesome-android-complete-reference
+      uri: git@github.com:amitshekhariitbhu/awesome-android-complete-reference.git
+      version: master
+- git:
+      local-name: android-best-practices
+      uri: git@github.com:futurice/android-best-practices.git
+      version: master
+- git:
+      local-name: android-developer-roadmap
+      uri: git@github.com:MindorksOpenSource/android-developer-roadmap.git
+      version: master
