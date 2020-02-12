@@ -32,24 +32,9 @@ public class HomeFragment extends Fragment {
         Button btnList = view.findViewById(R.id.btn_list);
         Button btnAbout = view.findViewById(R.id.btn_about);
 
-        btnMap.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Navigation.findNavController(v).navigate(R.id.mapFragment);
-            }
-        });
-        btnList.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Navigation.findNavController(v).navigate(R.id.listFragment);
-            }
-        });
-        btnAbout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Navigation.findNavController(v).navigate(R.id.aboutFragment);
-            }
-        });
+        btnMap.setOnClickListener(Navigation.createNavigateOnClickListener(R.id.action_homeFragment_to_mapFragment));
+        btnList.setOnClickListener(Navigation.createNavigateOnClickListener(R.id.action_homeFragment_to_listFragment));
+        btnAbout.setOnClickListener(Navigation.createNavigateOnClickListener(R.id.action_homeFragment_to_aboutFragment));
 
         return view;
     }
