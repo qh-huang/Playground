@@ -28,11 +28,11 @@ public class GoogleMapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-        SupportMapFragment smf = SupportMapFragment.newInstance();
+        SupportMapFragment smf = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.support_map_fragment);
         if (smf == null) {
-            getChildFragmentManager().beginTransaction().add(R.id.support_map_fragment, smf, "tag").commit();// findFragmentById(R.id.support_map_fragment);
+            smf = SupportMapFragment.newInstance();
         }
+        getChildFragmentManager().beginTransaction().add(R.id.support_map_fragment, smf, "tag").commit();
         smf.getMapAsync(this);
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_googlemap, container, false);
