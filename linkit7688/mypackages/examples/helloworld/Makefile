@@ -17,6 +17,7 @@ define Package/helloworld
 	SECTION:=examples
 	CATEGORY:=Examples
 	TITLE:=Hello, World!
+	DEPENDS:=+libc +libstdcpp
 endef
 
 # Package description; a more verbose description on what our package does
@@ -35,8 +36,8 @@ endef
 # Package build instructions; invoke the GNU make tool to build our package
 define Build/Compile
         $(MAKE) -C $(PKG_BUILD_DIR) \
-               CC="$(TARGET_CC)" \
-           CFLAGS="$(TARGET_CFLAGS)" \
+               CXX="$(TARGET_CXX)" \
+           CXXFLAGS="$(TARGET_CXXFLAGS)" \
           LDFLAGS="$(TARGET_LDFLAGS)"
 endef
 
