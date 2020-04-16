@@ -35,8 +35,11 @@ void my_subscribe_callback(struct mosquitto *mosq, void *userdata, int mid,
 
 int main(int argc, char *argv[]) {
   int i;
+  // char *host = "mqtt.eclipse.org";
   char *host = "localhost";
-  int port = 1883;
+  fprintf(stdout, "host: %s\n", host);
+  // int port = 1883;
+  int port = 1884;
   int keepalive = 60;
   bool clean_session = true;
   struct mosquitto *mosq = NULL;
@@ -57,6 +60,8 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
+  mosquitto_subscribe(mosq, NULL, "report", 2);
+  mosquitto_subscribe(mosq, NULL, "abc/def", 2);
   mosquitto_publish(mosq, NULL, "report", sizeof("hello"), "hello", 2, false);
   mosquitto_loop_forever(mosq, -1, 1);
 
