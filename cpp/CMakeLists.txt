@@ -14,3 +14,6 @@ include_directories(include)
 
 add_executable(app_main app_main.cc)
 add_executable(utils_main utils_main.cc)
+
+add_executable(actor_main actor_main.cc)
+target_link_libraries(actor_main pthread)
