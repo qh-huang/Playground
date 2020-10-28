@@ -1,0 +1,45 @@
+// 1265. Print Immutable Linked List in Reverse
+
+class Solution {
+public:
+    void print(ImmutableListNode* head, int count)
+    {
+        //Base case no elements.
+        if(count <= 0)
+            return;
+
+        //Base case: Only one element.
+        if(count == 1)
+        {
+            head->printValue();
+            return;
+        }
+
+        //Divide in half
+        int m = count/2;
+        
+        ImmutableListNode* mid = head;
+        for(int i = 0; i < m; i++)
+            mid = mid->getNext();
+
+        //Process second half first.
+        print(mid, count-m);
+
+        //Process first half.
+        print(head, m);
+    }
+
+    void printLinkedListInReverse(ImmutableListNode* head) {
+
+        //Get the size of the list.
+        int count = 0;
+        ImmutableListNode* tmp = head;
+        while(tmp)
+        {
+            count ++;
+            tmp = tmp->getNext();
+        }
+
+        print(head,  count);
+    }
+};

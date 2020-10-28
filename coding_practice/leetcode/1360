@@ -1,0 +1,66 @@
+// 1360. Number of Days Between Two Dates
+
+class Solution {
+public:
+    int daysBetweenDates(string date1, string date2) {
+        int year1, month1, day1, year2, month2, day2;
+        findYYMMDD(date1, year1, month1, day1);
+        findYYMMDD(date2, year2, month2, day2);
+        if (year1 > year2 ||
+            (year1 == year2 && month1 > month2) ||
+            (year1 == year2 && month1 == month2 && day1 > day2)
+           ) {
+           int tmp;
+           tmp = year2;
+           year2 = year1;
+           year1 = tmp;
+           tmp = month2;
+           month2 = month1;
+           month1 = tmp;
+           tmp = day2;
+           day2 = day1;
+           day1 = tmp;
+        }
+        // now date1 < date2
+        int sum_of_day = 0;
+        for (int y=year1; y<year2; y++) {
+          sum_of_day += (isPlus(y))? 366 : 365;
+        }
+        int day_of_year1 = findDayOfYear(year1, month1, day1);
+        int day_of_year2 = findDayOfYear(year2, month2, day2);
+        sum_of_day -= day_of_year1;
+        sum_of_day += day_of_year2;
+        return sum_of_day;
+    }
+
+    void findYYMMDD(const string& date, int& yy, int& mm, int& dd) {
+        yy = stoi(date.substr(0, 4));
+        mm = stoi(date.substr(5, 2));
+        dd = stoi(date.substr(8, 2));
+    }
+
+    int findDayOfYear(int yy, int mm, int dd) {
+        const static int days_of_month[13] = { 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+        const static int days_of_month_plus[13] = { 0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+
+        int day_of_year = 0;
+        if (isPlus(yy)) {
+            for (int i=1; i<mm; i++) {
+              day_of_year += days_of_month_plus[i];
+            }
+        } else {
+            for (int i=1; i<mm; i++) {
+              day_of_year += days_of_month[i];
+            }
+        }
+        day_of_year += dd;
+        return day_of_year;
+    }
+
+    bool isPlus(int yy) {
+        if (yy % 400 == 0) return true;
+        if (yy % 100 == 0) return false;
+        if (yy % 4 == 0) return true;
+        return false;
+    }
+};

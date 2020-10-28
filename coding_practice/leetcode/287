@@ -1,0 +1,11 @@
+class Solution {
+public:
+    int findDuplicate(vector<int>& nums) {
+        vector<int> freq(nums.size()+1, 0);
+        for (auto n : nums) {
+            if (freq[n] == 1) return n;
+            freq[n] = 1;
+        }
+        return 0;
+    }
+};

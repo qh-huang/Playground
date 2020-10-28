@@ -1,0 +1,47 @@
+// 21. Merge Two Sorted Lists
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) {
+        if (l1 == NULL) return l2;
+        if (l2 == NULL) return l1;
+
+        if (l1->val > l2->val) {
+            ListNode* tmp = l1;
+            l1 = l2;
+            l2 = tmp;
+        }
+
+        ListNode* cur1 = l1;
+        ListNode* cur2 = l2;
+        ListNode* prev1;
+        while (cur1 != NULL && cur2 != NULL) {
+            // cout << cur1->val << "," << cur2->val << endl;
+            if (cur1->val <= cur2->val) {
+                prev1 = cur1;
+                cur1 = cur1->next;
+            } else {
+                // cur1->val > cur2->val: insert cur2 to prev1
+                prev1->next = cur2;
+                cur2 = cur2->next;
+                prev1->next->next = cur1;
+                prev1 = prev1->next;
+            }
+        }
+        if (cur1 == NULL) {
+            if (cur2 != NULL) {
+                prev1->next = cur2;
+            }
+        }
+        return l1;
+    }
+};

@@ -1,0 +1,7 @@
+// 723. Candy Crush
+
+class Solution {
+public:
+    vector<vector<int>> candyCrush(vector<vector<int>>& board) {
+    }
+};
