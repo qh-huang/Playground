@@ -18,7 +18,12 @@ add_executable(rsa_main rsa_main.cc)
 target_link_libraries(rsa_main crypto)
 
 add_executable(app_main app_main.cc)
+add_executable(thr_main thr_main.cc)
+target_link_libraries(thr_main pthread)
+
 add_executable(utils_main utils_main.cc)
+
 add_executable(serial_main serial_main.cc)
 target_link_libraries(serial_main pthread)
+
 add_executable(exec_main exec_main.cc)
