@@ -50,14 +50,13 @@ std::string Exec(const char *cmd, int timeout_ms) {
   return result;
 }
 
-int main(int argc, char* argv[])
-{
-    if (argc < 2) {
-        std::cerr << "no arguments" << std::endl;
-        return  1;
-    }
+int main(int argc, char *argv[]) {
+  if (argc < 2) {
+    std::cerr << "no arguments" << std::endl;
+    return 1;
+  }
 
-    std::cout << Exec(argv[1], 1000) << std::endl;
+  std::cout << Exec(argv[1], 1000) << std::endl;
 
-    return 0;
+  return 0;
 }
