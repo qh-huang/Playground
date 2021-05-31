@@ -124,9 +124,8 @@ public:
       START
   };
 
-  using TestStateMachine = StateMachineBase<TestStateId, TestEventId>;  
+  using TestStateMachine = StateMachineBase<TestStateId, TestEventId, TestNode>;  
 
-  shared_ptr<TestStateMachine> state_machine_;  
   struct EventA : public TestStateMachine::EventBase {
     int data;
     EventA(int d) : EventBase(TestEventId::A, "EV_A"), data(d) {}
@@ -188,7 +187,7 @@ public:
 
   void Activate() 
   {
-      state_machine_->Start(make_shared<IdleState>());
+      state_machine_->Start(make_shared<IdleState>(), this);
   }
 
   void ProcMsg(MsgBasePtr msg) override {
@@ -202,6 +201,10 @@ public:
       cout << "ignore msg_type: " << msg->msg_name;
     }
   }
+
+private:
+  shared_ptr<TestStateMachine> state_machine_;  
+
 };
 
 int main(int argc, char *argv[]) {

@@ -12,8 +12,8 @@
 using namespace std;
 
 
-template<typename StateIdEnumT, typename EventIdEnumT>
-class StateMachineBase : public enable_shared_from_this<StateMachineBase<StateIdEnumT, EventIdEnumT> > {
+template<typename StateIdEnumT, typename EventIdEnumT, class ContextT>
+class StateMachineBase : public enable_shared_from_this<StateMachineBase<StateIdEnumT, EventIdEnumT, ContextT> > {
 public:
 
     struct EventBase
@@ -41,26 +41,31 @@ public:
         {
             if (!state_machine_) {
                 cerr << "state_machine_ is null" << endl;
-            } else {
-                cout << "state transition: " << GetName() << " ==> " << st->GetName() << endl;
-                state_machine_->TransitTo(st);
-            }
+                return;
+            } 
+
+            cout << "state transition: " << GetName() << " ==> " << st->GetName() << endl;
+            state_machine_->TransitTo(st);        
         }
 
-        friend class StateMachineBase<StateIdEnumT, EventIdEnumT>;
+        friend class StateMachineBase<StateIdEnumT, EventIdEnumT, ContextT>;
+
+    protected:
+        static shared_ptr<ContextT> ctx_;
+
     private:
         const string st_name;
         const StateIdEnumT st_id;
-        static shared_ptr<StateMachineBase<StateIdEnumT, EventIdEnumT> > state_machine_;
-        // shared_ptr<StateMachineBase<StateIdEnumT, EventIdEnumT> > state_machine_;
+
+        static shared_ptr<StateMachineBase<StateIdEnumT, EventIdEnumT, ContextT> > state_machine_;
     };
-    
 
     StateMachineBase(): st_(nullptr), ev_proc_thread_(nullptr) {}
 
-    void Start(shared_ptr<StateBase> init_state) 
+    void Start(shared_ptr<StateBase> init_state, ContextT* ctx) 
     {
         StateBase::state_machine_ = this->shared_from_this();
+        StateBase::ctx_ = shared_ptr<ContextT>(ctx);
         st_ = init_state;
         thread_run_ = true;
         ev_proc_thread_ = make_shared<thread>(&StateMachineBase::EventProcThreadLoop, this);
@@ -146,7 +151,8 @@ private:
 
     shared_ptr<StateBase> st_;
 };
-template<typename StateIdEnumT, typename EventIdEnumT> shared_ptr<StateMachineBase<StateIdEnumT, EventIdEnumT> > StateMachineBase<StateIdEnumT, EventIdEnumT>::StateBase::state_machine_ = nullptr;
+template<typename StateIdEnumT, typename EventIdEnumT, class ContextT> shared_ptr<StateMachineBase<StateIdEnumT, EventIdEnumT, ContextT> > StateMachineBase<StateIdEnumT, EventIdEnumT, ContextT>::StateBase::state_machine_ = nullptr;
+template<typename StateIdEnumT, typename EventIdEnumT, class ContextT> shared_ptr<ContextT> StateMachineBase<StateIdEnumT, EventIdEnumT, ContextT>::StateBase::ctx_ = nullptr;
 
 
 // template<typename StateIdEnumT, typename EventIdEnumT>
