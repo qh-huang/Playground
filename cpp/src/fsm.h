@@ -1,19 +1,13 @@
 #pragma once
 
-
-#include <string>
-#include <memory>
-#include <iostream>
+#include "looper.h"
 #include <queue>
-#include <mutex>
-#include <thread>
-#include <condition_variable>
 
 using namespace std;
 
 
 template<typename StateIdEnumT, typename EventIdEnumT, class ContextT>
-class StateMachineBase : public enable_shared_from_this<StateMachineBase<StateIdEnumT, EventIdEnumT, ContextT> > {
+class StateMachineBase : public Looper, public enable_shared_from_this<StateMachineBase<StateIdEnumT, EventIdEnumT, ContextT> > {
 public:
 
     struct EventBase
@@ -60,25 +54,33 @@ public:
         static shared_ptr<StateMachineBase<StateIdEnumT, EventIdEnumT, ContextT> > state_machine_;
     };
 
-    StateMachineBase(): st_(nullptr), ev_proc_thread_(nullptr) {}
+    StateMachineBase(string name): Looper(name), sm_name_(name), st_(nullptr) 
+    {
+        Looper::Activate();
+    }
 
     void Start(shared_ptr<StateBase> init_state, ContextT* ctx) 
     {
+        cout << __FILE__ << ": " << __LINE__ << ":" << __FUNCTION__ << endl;
         StateBase::state_machine_ = this->shared_from_this();
+        cout << __FILE__ << ": " << __LINE__ << ":" << __FUNCTION__ << endl;
         StateBase::ctx_ = shared_ptr<ContextT>(ctx);
+        cout << __FILE__ << ": " << __LINE__ << ":" << __FUNCTION__ << endl;
         st_ = init_state;
-        thread_run_ = true;
-        ev_proc_thread_ = make_shared<thread>(&StateMachineBase::EventProcThreadLoop, this);
+        cout << __FILE__ << ": " << __LINE__ << ":" << __FUNCTION__ << endl;
+        st_->ActionEntry();
+        cout << __FILE__ << ": " << __LINE__ << ":" << __FUNCTION__ << endl;
     }
 
     void Stop()
     {
-        thread_run_ = false;
-        if (ev_proc_thread_) {
-            cv_.notify_one();
-            ev_proc_thread_->join();
-            ev_proc_thread_.reset();
-        }
+        cout << __FILE__ << ": " << __LINE__ << ":" << __FUNCTION__ << endl;
+        st_->ActionExit();
+        cout << __FILE__ << ": " << __LINE__ << ":" << __FUNCTION__ << endl;
+        st_.reset();
+        cout << __FILE__ << ": " << __LINE__ << ":" << __FUNCTION__ << endl;
+        // StateBase::ctx_.reset();
+        cout << __FILE__ << ": " << __LINE__ << ":" << __FUNCTION__ << endl;
     }
 
     virtual ~StateMachineBase()
@@ -88,8 +90,9 @@ public:
 
     void DispatchEvent(shared_ptr<EventBase> ev) 
     {
+        cout << "pushing event: " << ev->ev_name << endl;
         ev_queue_.push(ev);
-        cv_.notify_one();
+        Looper::Notify();
     }
 
     void ProcessEvent(shared_ptr<EventBase> ev) {
@@ -112,47 +115,38 @@ public:
     }
 
 private:
-    void EventProcThreadLoop() {
-        while (thread_run_) {
-            unique_lock<mutex> lk(mtx_cv_);
-            cout << "thread waits for notify" << endl;
-            cv_.wait(lk, [this] {
-                return !thread_run_ || ev_queue_.size() != 0;
-            });
-            cout << "thread was notified" << endl;
-            lk.unlock();
+    // Looper::SpinOnce
+    void SpinOnce() override 
+    {
+        shared_ptr<EventBase> ev = nullptr;
+        mtx_ev_queue_.lock();
+        if (!ev_queue_.empty()) {
+            ev = ev_queue_.front();
+            ev_queue_.pop();
+        }
+        mtx_ev_queue_.unlock();
 
-            // thread_run_ might be toggled by another thread
-            if (!thread_run_)
-                break;
-
-            shared_ptr<EventBase> ev = nullptr;
-            mtx_ev_queue_.lock();
-            if (!ev_queue_.empty()) {
-                ev = ev_queue_.front();
-                ev_queue_.pop();
-            }
-            mtx_ev_queue_.unlock();
-
-            if (ev) {
-                ProcessEvent(ev);
-            }
-
+        if (ev) {
+            ProcessEvent(ev);
         }
     }
+    
+    // Looper::WaitCondition
+    bool WaitCondition() override 
+    {
+        return !ev_queue_.empty();
+    }
 
-    shared_ptr<thread> ev_proc_thread_;
-    bool thread_run_;
-    condition_variable cv_;
-    mutex mtx_cv_;
 
     queue<shared_ptr<EventBase> > ev_queue_;
     mutex mtx_ev_queue_;
 
     shared_ptr<StateBase> st_;
+
+    const string sm_name_;
 };
 template<typename StateIdEnumT, typename EventIdEnumT, class ContextT> shared_ptr<StateMachineBase<StateIdEnumT, EventIdEnumT, ContextT> > StateMachineBase<StateIdEnumT, EventIdEnumT, ContextT>::StateBase::state_machine_ = nullptr;
-template<typename StateIdEnumT, typename EventIdEnumT, class ContextT> shared_ptr<ContextT> StateMachineBase<StateIdEnumT, EventIdEnumT, ContextT>::StateBase::ctx_ = nullptr;
+template<typename StateIdEnumT, typename EventIdEnumT, class ContextT> shared_ptr<ContextT> StateMachineBase<StateIdEnumT, EventIdEnumT, ContextT>::StateBase::ctx_;
 
 
 // template<typename StateIdEnumT, typename EventIdEnumT>
