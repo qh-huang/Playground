@@ -6,6 +6,8 @@
 using namespace std;
 
 
+// TODO: create a Dispatcher<Object>: public Looper {} to process msg/event asynchronously
+
 template<typename StateIdEnumT, typename EventIdEnumT, class ContextT>
 class StateMachineBase : public Looper, public enable_shared_from_this<StateMachineBase<StateIdEnumT, EventIdEnumT, ContextT> > {
 public:
@@ -59,33 +61,26 @@ public:
         Looper::Activate();
     }
 
-    void Start(shared_ptr<StateBase> init_state, ContextT* ctx) 
+    // void Start(shared_ptr<StateBase> init_state, ContextT* ctx) 
+    void Start(shared_ptr<StateBase> init_state, shared_ptr<ContextT> ctx) 
     {
-        cout << __FILE__ << ": " << __LINE__ << ":" << __FUNCTION__ << endl;
         StateBase::state_machine_ = this->shared_from_this();
-        cout << __FILE__ << ": " << __LINE__ << ":" << __FUNCTION__ << endl;
-        StateBase::ctx_ = shared_ptr<ContextT>(ctx);
-        cout << __FILE__ << ": " << __LINE__ << ":" << __FUNCTION__ << endl;
+        StateBase::ctx_ = ctx; // shared_ptr<ContextT>(ctx);
         st_ = init_state;
-        cout << __FILE__ << ": " << __LINE__ << ":" << __FUNCTION__ << endl;
         st_->ActionEntry();
-        cout << __FILE__ << ": " << __LINE__ << ":" << __FUNCTION__ << endl;
     }
 
     void Stop()
     {
-        cout << __FILE__ << ": " << __LINE__ << ":" << __FUNCTION__ << endl;
         st_->ActionExit();
-        cout << __FILE__ << ": " << __LINE__ << ":" << __FUNCTION__ << endl;
         st_.reset();
-        cout << __FILE__ << ": " << __LINE__ << ":" << __FUNCTION__ << endl;
-        // StateBase::ctx_.reset();
-        cout << __FILE__ << ": " << __LINE__ << ":" << __FUNCTION__ << endl;
+        StateBase::ctx_.reset();
     }
 
     virtual ~StateMachineBase()
     {
         Stop();
+        Looper::Deactivate();
     }
 
     void DispatchEvent(shared_ptr<EventBase> ev) 
@@ -149,41 +144,3 @@ template<typename StateIdEnumT, typename EventIdEnumT, class ContextT> shared_pt
 template<typename StateIdEnumT, typename EventIdEnumT, class ContextT> shared_ptr<ContextT> StateMachineBase<StateIdEnumT, EventIdEnumT, ContextT>::StateBase::ctx_;
 
 
-// template<typename StateIdEnumT, typename EventIdEnumT>
-// class StateBase
-// {
-// public:
-//     static shared_ptr<StateMachineBase<StateIdEnumT, EventIdEnumT> > state_machine_;
-
-//     StateBase(StateIdEnumT sid, const string name, shared_ptr<StateMachineBase<StateIdEnumT, EventIdEnumT> > st_machine = nullptr): st_id(sid), st_name(name)
-//     {
-//         cerr << __FILE__ << ": " << __LINE__ << endl;
-//         if (st_machine) {
-//             state_machine_ = st_machine;
-//         }
-//     }
-//     virtual ~StateBase() = default;
-
-//     string GetName() const { return st_name; }
-
-//     virtual void OnEvent(shared_ptr<EventBase<EventIdEnumT> > ev) = 0;
-//     virtual void ActionEntry() = 0;
-//     virtual void ActionExit() = 0;
-//     // TODO: bool ActionGuard()?
-
-//     void TransitTo(shared_ptr<StateBase<StateIdEnumT, EventIdEnumT> > st) 
-//     {
-//         if (!state_machine_) {
-//             cerr << "state_machine_ is null" << endl;
-//         } else {
-//             state_machine_->TransitTo(st);
-//         }
-//     }
-
-//     friend class StateMachineBase<StateIdEnumT, EventIdEnumT>;
-// private:
-//     const string st_name;
-//     const StateIdEnumT st_id;
-// };
-// // template<typename StateIdEnumT, typename EventIdEnumT> StateMachineBase<StateIdEnumT, EventIdEnumT> StateBase<StateIdEnumT, EventIdEnumT>::state_machine_;
-// template<typename StateIdEnumT, typename EventIdEnumT> shared_ptr<StateMachineBase<StateIdEnumT, EventIdEnumT> > StateBase<StateIdEnumT, EventIdEnumT>::state_machine_ = nullptr;

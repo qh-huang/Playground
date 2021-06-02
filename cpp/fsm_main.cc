@@ -13,7 +13,8 @@ struct MsgA : public MsgBase {
   MsgA(int d) : MsgBase(MsgId::MSG_A, "MSG_A"), data(d) {}
 };
 
-class TestNode : public MsgHandler, enable_shared_from_this<TestNode> {
+// TODO: Context should always inherit enable_shared_from_this, create class IStateContext for TestNode to inherit from
+class TestNode : public MsgHandler, public enable_shared_from_this<TestNode> {
 public:
   enum class TestEventId
   {
@@ -82,19 +83,19 @@ public:
   };
 
   TestNode(): MsgHandler("test_node") {
-      state_machine_ = make_shared<TestStateMachine>("test_node");
+    state_machine_ = make_shared<TestStateMachine>("test_node");
   }
 
   virtual ~TestNode() = default;
 
   void Activate() 
   {
-      state_machine_->Start(make_shared<IdleState>(), this);
+    state_machine_->Start(make_shared<IdleState>(), this->shared_from_this());
   }
 
   void Deactivate()
   {
-      state_machine_->Stop();
+    state_machine_->Stop();
   }
 
   // MsgHandler::ProcMsg
@@ -118,15 +119,16 @@ private:
 
 int main(int argc, char *argv[]) {
   shared_ptr<TestNode> tn = make_shared<TestNode>();
-  tn->Activate();
+  // tn->Activate();
 
   int k = 0;
   while (true) {
-    // tn->Activate(); // FIXME: cannot re-start (double free or corruption)
+    tn->Activate();
     for (int i = 0; i < 10; i++) {
       tn->DispatchMsg(make_shared<MsgA>(k++));
+      this_thread::sleep_for(chrono::milliseconds(100));
     }
-    // tn->Deactivate();
+    tn->Deactivate();
     this_thread::sleep_for(chrono::seconds(1));
   }
 
