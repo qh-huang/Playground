@@ -19,6 +19,7 @@ file(GLOB_RECURSE ALL_LIBRARY_SRCS "src/*.c" "src/*.cc" "src/*.cpp")
 include_directories(src)
 
 add_library(mycpp ${ALL_LIBRARY_SRCS})
+target_link_libraries(mycpp pthread)
 
 add_executable(rsa_main rsa_main.cc)
 target_link_libraries(rsa_main crypto)
@@ -39,3 +40,6 @@ add_executable(regdata_main regdata_main.cc)
 
 add_executable(fsm_main fsm_main.cc)
 target_link_libraries(fsm_main pthread)
+
+add_executable(spinner_main spinner_main.cc)
+target_link_libraries(spinner_main pthread)

@@ -143,4 +143,3 @@ private:
 template<typename StateIdEnumT, typename EventIdEnumT, class ContextT> shared_ptr<StateMachineBase<StateIdEnumT, EventIdEnumT, ContextT> > StateMachineBase<StateIdEnumT, EventIdEnumT, ContextT>::StateBase::state_machine_ = nullptr;
 template<typename StateIdEnumT, typename EventIdEnumT, class ContextT> shared_ptr<ContextT> StateMachineBase<StateIdEnumT, EventIdEnumT, ContextT>::StateBase::ctx_;
 
-
