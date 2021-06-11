@@ -10,10 +10,7 @@ template<typename T>
 class Dispatcher : public Looper
 {
 public:
-    Dispatcher(string name) : Looper(name + "_dispatcher") 
-    {
-        Looper::Activate();
-    }
+    Dispatcher(string name) : Looper(name + "_dispatcher") {}
     virtual ~Dispatcher() = default;
 
     void Dispatch(const T& t) {

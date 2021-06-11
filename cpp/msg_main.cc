@@ -25,10 +25,10 @@ using WeatherInfoMsgPtr = shared_ptr<WeatherInfoMsg>;
 
 DEFINE_MSG(StockInfo, STOCK_INFO, stock_info)
 
-class WeatherMan : public MsgHandler
+class WeatherMan : public MsgBus::Subscriber
 {
 public:
-    WeatherMan(): MsgHandler("weatherman") {}
+    WeatherMan(): MsgBus::Subscriber("weatherman") {}
     bool ProcMsg(MsgPtr msg) {
         if (msg->msg_id == WEATHER_INFO) {
             // WeatherInfoMsgPtr wmp = dynamic_pointer_cast<WeatherInfoMsgPtr>(msg);
@@ -42,7 +42,28 @@ public:
     }
 };
 
+class StockTrader : public MsgBus::Subscriber
+{
+public:
+    StockTrader(): MsgBus::Subscriber("stock_trader") {}
+    void Activate() {
+        Subscribe(STOCK_INFO);
+        Subscriber::Activate();
+    }
 
+    bool ProcMsg(MsgPtr msg) {
+        if (msg->msg_id == STOCK_INFO) {
+            // WeatherInfoMsgPtr wmp = dynamic_pointer_cast<WeatherInfoMsgPtr>(msg);
+            StockInfoMsgPtr sp = dynamic_pointer_cast<StockInfoMsg>(msg);
+            cout << "stock id: " << sp->stock_info.stock_id << endl;
+            cout << "stock price: " << sp->stock_info.price << endl;
+        } else {
+            cout << "StockTrader ignore msg: " << msg->msg_name; 
+        }
+        return true;
+    }        
+    
+};
 
 int main(int argc, char* argv[])
 {
@@ -58,10 +79,14 @@ int main(int argc, char* argv[])
     StockInfoMsgPtr si_ptr = make_shared<StockInfoMsg>(si);
 
     shared_ptr<WeatherMan> wm = make_shared<WeatherMan>();
+    wm->Subscribe(WEATHER_INFO);
+    wm->Activate();
+    // MsgBus::Subscribe(WEATHER_INFO, wm);
 
-    MsgBus::Subscribe(WEATHER_INFO, wm);
+    shared_ptr<StockTrader> stock_trader = make_shared<StockTrader>();
+    stock_trader->Activate();
 
-    this_thread::sleep_for(std::chrono::milliseconds(2000));
+    // this_thread::sleep_for(std::chrono::milliseconds(2000));
 
     MsgBus::Publish(wp);
     MsgBus::Publish(si_ptr);
