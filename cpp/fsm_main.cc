@@ -27,7 +27,7 @@ public:
       START
   };
 
-  using TestStateMachine = StateMachineBase<TestStateId, TestEventId, TestNode>;  
+  using TestStateMachine = EvStateMachineBase<TestStateId, TestEventId, TestNode>;  
 
   struct EventA : public TestStateMachine::EventBase {
     int data;

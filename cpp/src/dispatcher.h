@@ -10,17 +10,20 @@ template<typename T>
 class Dispatcher : public Looper
 {
 public:
-    Dispatcher(string name) : Looper(name + "_dispatcher") {}
+    Dispatcher(string name) : Looper(name + "_dispatcher") 
+    {
+        Looper::Activate();
+    }
     virtual ~Dispatcher() = default;
 
     void Dispatch(const T& t) {
         lock_guard<mutex> lock(mtx_queue_);
-        queue_.push();
+        queue_.push(t);
         Looper::Notify();
     }
 
     // return true if successfully processed
-    virtual bool Process(T& t) = 0;
+    virtual bool Process(T t) = 0;
 
     // Looper::SpinOnce
     void SpinOnce() override {
@@ -38,7 +41,7 @@ public:
     // Looper::WaitCondition
     bool WaitCondition() override 
     {
-        return !queue.empty();
+        return !queue_.empty();
     }
 
 private:

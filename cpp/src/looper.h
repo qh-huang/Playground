@@ -13,7 +13,7 @@ class Looper
 {
 public:
     Looper(string name, uint32_t spin_interval_ms = 0): 
-        looper_name_(name), 
+        looper_name_(name + "_looper"), 
         thread_run_(false), 
         spin_interval_ms_(spin_interval_ms) {}
 

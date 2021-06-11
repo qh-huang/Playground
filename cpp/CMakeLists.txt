@@ -43,3 +43,7 @@ target_link_libraries(fsm_main pthread)
 
 add_executable(spinner_main spinner_main.cc)
 target_link_libraries(spinner_main pthread)
+
+add_executable(msg_main msg_main.cc)
+target_link_libraries(msg_main mycpp)
+

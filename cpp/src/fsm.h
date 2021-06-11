@@ -6,10 +6,89 @@
 using namespace std;
 
 
-// TODO: create a Dispatcher<Object>: public Looper {} to process msg/event asynchronously
+template<typename StateIdEnumT, class ContextT>
+class StateMachineBase : public Looper, public enable_shared_from_this<StateMachineBase<StateIdEnumT, ContextT> > {
+public:
 
+    class StateBase
+    {
+    public:
+        StateBase(StateIdEnumT sid, const string name): st_id(sid), st_name(name) {}
+        virtual ~StateBase() = default;
+
+        string GetName() const { return st_name; }
+
+        virtual void ActionEntry() { cout << "defualt ActionEntry()" << endl; }
+        virtual void ActionExit() = 0;
+        // TODO: bool ActionGuard()?
+
+        void TransitTo(shared_ptr<StateBase> st) 
+        {
+            if (!state_machine_) {
+                cerr << "state_machine_ is null" << endl;
+                return;
+            } 
+
+            cout << "state transition: " << GetName() << " ==> " << st->GetName() << endl;
+            state_machine_->TransitTo(st);        
+        }
+
+        friend class StateMachineBase<StateIdEnumT, ContextT>;
+
+    protected:
+        static shared_ptr<ContextT> ctx_;
+
+    private:
+        const string st_name;
+        const StateIdEnumT st_id;
+
+        static shared_ptr<StateMachineBase<StateIdEnumT, ContextT> > state_machine_;
+    };
+
+    StateMachineBase(string name): sm_name_(name), st_(nullptr) {}
+
+    // void Start(shared_ptr<StateBase> init_state, ContextT* ctx) 
+    void Start(shared_ptr<StateBase> init_state, shared_ptr<ContextT> ctx) 
+    {
+        StateBase::state_machine_ = this->shared_from_this();
+        StateBase::ctx_ = ctx; // shared_ptr<ContextT>(ctx);
+        st_ = init_state;
+        st_->ActionEntry();
+    }
+
+    void Stop()
+    {
+        st_->ActionExit();
+        st_.reset();
+        StateBase::ctx_.reset();
+    }
+
+    virtual ~StateMachineBase()
+    {
+        Stop();
+    }
+
+    void TransitTo(shared_ptr<StateBase> st) {
+        if (st->GetName() == st_->GetName()) {
+            // warning: ignore same state transition
+            return;
+        }
+        st_->ActionExit();
+        st_ = st;
+        st_->ActionEntry();
+    }
+
+private:
+    shared_ptr<StateBase> st_;
+
+    const string sm_name_;
+};
+template<typename StateIdEnumT, class ContextT> shared_ptr<StateMachineBase<StateIdEnumT, ContextT> > StateMachineBase<StateIdEnumT, ContextT>::StateBase::state_machine_ = nullptr;
+template<typename StateIdEnumT, class ContextT> shared_ptr<ContextT> StateMachineBase<StateIdEnumT, ContextT>::StateBase::ctx_;
+
+// TODO: create a Dispatcher<Object>: public Looper {} to process msg/event asynchronously
 template<typename StateIdEnumT, typename EventIdEnumT, class ContextT>
-class StateMachineBase : public Looper, public enable_shared_from_this<StateMachineBase<StateIdEnumT, EventIdEnumT, ContextT> > {
+class EvStateMachineBase : public Looper, public enable_shared_from_this<EvStateMachineBase<StateIdEnumT, EventIdEnumT, ContextT> > {
 public:
 
     struct EventBase
@@ -44,7 +123,7 @@ public:
             state_machine_->TransitTo(st);        
         }
 
-        friend class StateMachineBase<StateIdEnumT, EventIdEnumT, ContextT>;
+        friend class EvStateMachineBase<StateIdEnumT, EventIdEnumT, ContextT>;
 
     protected:
         static shared_ptr<ContextT> ctx_;
@@ -53,10 +132,10 @@ public:
         const string st_name;
         const StateIdEnumT st_id;
 
-        static shared_ptr<StateMachineBase<StateIdEnumT, EventIdEnumT, ContextT> > state_machine_;
+        static shared_ptr<EvStateMachineBase<StateIdEnumT, EventIdEnumT, ContextT> > state_machine_;
     };
 
-    StateMachineBase(string name): Looper(name), sm_name_(name), st_(nullptr) 
+    EvStateMachineBase(string name): Looper(name), sm_name_(name), st_(nullptr) 
     {
         Looper::Activate();
     }
@@ -77,7 +156,7 @@ public:
         StateBase::ctx_.reset();
     }
 
-    virtual ~StateMachineBase()
+    virtual ~EvStateMachineBase()
     {
         Stop();
         Looper::Deactivate();
@@ -140,6 +219,6 @@ private:
 
     const string sm_name_;
 };
-template<typename StateIdEnumT, typename EventIdEnumT, class ContextT> shared_ptr<StateMachineBase<StateIdEnumT, EventIdEnumT, ContextT> > StateMachineBase<StateIdEnumT, EventIdEnumT, ContextT>::StateBase::state_machine_ = nullptr;
-template<typename StateIdEnumT, typename EventIdEnumT, class ContextT> shared_ptr<ContextT> StateMachineBase<StateIdEnumT, EventIdEnumT, ContextT>::StateBase::ctx_;
+template<typename StateIdEnumT, typename EventIdEnumT, class ContextT> shared_ptr<EvStateMachineBase<StateIdEnumT, EventIdEnumT, ContextT> > EvStateMachineBase<StateIdEnumT, EventIdEnumT, ContextT>::StateBase::state_machine_ = nullptr;
+template<typename StateIdEnumT, typename EventIdEnumT, class ContextT> shared_ptr<ContextT> EvStateMachineBase<StateIdEnumT, EventIdEnumT, ContextT>::StateBase::ctx_;
 
