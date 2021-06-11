@@ -19,11 +19,13 @@ public:
 
     virtual ~Looper() { Deactivate(); }
 
+    bool IsActive() { return (looper_thread_)? true : false; }
+
     void Activate()
     {
         if (looper_thread_)
         {
-            cerr << "lopper " << looper_name_ << " is already running" << endl;
+            cerr << "[" << looper_name_ << "] is already running" << endl;
             return;
         }
         thread_run_ = true;
@@ -32,6 +34,10 @@ public:
 
     void Deactivate()
     {
+        if (!IsActive()) {
+            return;
+        }
+
         thread_run_ = false;
         if (looper_thread_)
         {
