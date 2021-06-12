@@ -65,6 +65,25 @@ public:
     
 };
 
+class WeatherInfoBroadcaster : public Looper, public MsgBus::Publisher 
+{
+public:
+    WeatherInfoBroadcaster() : Looper("weather_broadcase", 500) {}
+
+    void SpinOnce() override {
+        static int temperature = 20;
+        static int humidity = 1;
+        WeatherInfoMsgPtr wp = make_shared<WeatherInfoMsg>();
+        wp->weather_info.temperature = temperature++;
+        wp->weather_info.humidity = humidity++;
+        Publish(wp);
+    }
+
+    bool WaitCondition() override {
+        return true;
+    }
+};
+
 int main(int argc, char* argv[])
 {
     WeatherInfo wi;
@@ -90,6 +109,9 @@ int main(int argc, char* argv[])
 
     MsgBus::Publish(wp);
     MsgBus::Publish(si_ptr);
+
+    WeatherInfoBroadcaster wb;
+    wb.Activate();
 
     int i;
     cin >> i;
