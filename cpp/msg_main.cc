@@ -12,29 +12,24 @@ struct StockInfo
     double price;
 };
 
-constexpr MsgId WEATHER_INFO = 0x000000001;
-constexpr MsgId STOCK_INFO = 0x000000002;
+namespace DataType {
+    constexpr DataId WEATHER_INFO = 0x0F0000001;
+    constexpr DataId STOCK_INFO = 0x0F0000002;
+}
 
-struct WeatherInfoMsg : public MsgBase
-{
-    WeatherInfo weather_info;
-    WeatherInfoMsg(): MsgBase(WEATHER_INFO, "WEATHER_INFO") {}
-    WeatherInfoMsg(WeatherInfo wi): MsgBase(WEATHER_INFO, "WEATHER_INFO"), weather_info(wi) {}
-};
-using WeatherInfoMsgPtr = shared_ptr<WeatherInfoMsg>;
-
-DEFINE_MSG(StockInfo, STOCK_INFO, stock_info)
+DEFINE_MSG(WeatherInfo, WEATHER_INFO)
+DEFINE_MSG(StockInfo, STOCK_INFO)
 
 class WeatherMan : public MsgBus::Subscriber
 {
 public:
     WeatherMan(): MsgBus::Subscriber("weatherman") {}
     bool ProcMsg(MsgPtr msg) {
-        if (msg->msg_id == WEATHER_INFO) {
+        if (msg->msg_id == DataType::WEATHER_INFO) {
             // WeatherInfoMsgPtr wmp = dynamic_pointer_cast<WeatherInfoMsgPtr>(msg);
             shared_ptr<WeatherInfoMsg> wmp = dynamic_pointer_cast<WeatherInfoMsg>(msg);
-            cout << "temperature: " << wmp->weather_info.temperature << endl;
-            cout << "humidity: " << wmp->weather_info.humidity << endl;
+            cout << "temperature: " << wmp->data.temperature << endl;
+            cout << "humidity: " << wmp->data.humidity << endl;
         } else {
             cout << "WeatherMan ignore msg: " << msg->msg_name; 
         }
@@ -47,16 +42,16 @@ class StockTrader : public MsgBus::Subscriber
 public:
     StockTrader(): MsgBus::Subscriber("stock_trader") {}
     void Activate() {
-        Subscribe(STOCK_INFO);
+        Subscribe(DataType::STOCK_INFO);
         Subscriber::Activate();
     }
 
     bool ProcMsg(MsgPtr msg) {
-        if (msg->msg_id == STOCK_INFO) {
+        if (msg->msg_id == DataType::STOCK_INFO) {
             // WeatherInfoMsgPtr wmp = dynamic_pointer_cast<WeatherInfoMsgPtr>(msg);
             StockInfoMsgPtr sp = dynamic_pointer_cast<StockInfoMsg>(msg);
-            cout << "stock id: " << sp->stock_info.stock_id << endl;
-            cout << "stock price: " << sp->stock_info.price << endl;
+            cout << "stock id: " << sp->data.stock_id << endl;
+            cout << "stock price: " << sp->data.price << endl;
         } else {
             cout << "StockTrader ignore msg: " << msg->msg_name; 
         }
@@ -74,8 +69,8 @@ public:
         static int temperature = 20;
         static int humidity = 1;
         WeatherInfoMsgPtr wp = make_shared<WeatherInfoMsg>();
-        wp->weather_info.temperature = temperature++;
-        wp->weather_info.humidity = humidity++;
+        wp->data.temperature = temperature++;
+        wp->data.humidity = humidity++;
         Publish(wp);
     }
 
@@ -83,6 +78,8 @@ public:
         return true;
     }
 };
+
+
 
 int main(int argc, char* argv[])
 {
@@ -98,7 +95,7 @@ int main(int argc, char* argv[])
     StockInfoMsgPtr si_ptr = make_shared<StockInfoMsg>(si);
 
     shared_ptr<WeatherMan> wm = make_shared<WeatherMan>();
-    wm->Subscribe(WEATHER_INFO);
+    wm->Subscribe(DataType::WEATHER_INFO);
     wm->Activate();
     // MsgBus::Subscribe(WEATHER_INFO, wm);
 

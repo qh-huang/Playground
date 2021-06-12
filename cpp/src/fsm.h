@@ -7,7 +7,7 @@ using namespace std;
 
 
 template<typename StateIdEnumT, class ContextT>
-class StateMachineBase : public Looper, public enable_shared_from_this<StateMachineBase<StateIdEnumT, ContextT> > {
+class StateMachineBase : public Looper {
 public:
 
     class StateBase
@@ -36,21 +36,21 @@ public:
         friend class StateMachineBase<StateIdEnumT, ContextT>;
 
     protected:
-        static shared_ptr<ContextT> ctx_;
+        static ContextT* ctx_;
 
     private:
         const string st_name;
         const StateIdEnumT st_id;
 
-        static shared_ptr<StateMachineBase<StateIdEnumT, ContextT> > state_machine_;
+        static StateMachineBase<StateIdEnumT, ContextT>* state_machine_;
     };
 
     StateMachineBase(string name): sm_name_(name), st_(nullptr) {}
 
     // void Start(shared_ptr<StateBase> init_state, ContextT* ctx) 
-    void Start(shared_ptr<StateBase> init_state, shared_ptr<ContextT> ctx) 
+    void Start(shared_ptr<StateBase> init_state, ContextT* ctx) 
     {
-        StateBase::state_machine_ = this->shared_from_this();
+        StateBase::state_machine_ = this;
         StateBase::ctx_ = ctx; // shared_ptr<ContextT>(ctx);
         st_ = init_state;
         st_->ActionEntry();
@@ -60,7 +60,6 @@ public:
     {
         st_->ActionExit();
         st_.reset();
-        StateBase::ctx_.reset();
     }
 
     virtual ~StateMachineBase()
@@ -83,12 +82,12 @@ private:
 
     const string sm_name_;
 };
-template<typename StateIdEnumT, class ContextT> shared_ptr<StateMachineBase<StateIdEnumT, ContextT> > StateMachineBase<StateIdEnumT, ContextT>::StateBase::state_machine_ = nullptr;
-template<typename StateIdEnumT, class ContextT> shared_ptr<ContextT> StateMachineBase<StateIdEnumT, ContextT>::StateBase::ctx_;
+template<typename StateIdEnumT, class ContextT> StateMachineBase<StateIdEnumT, ContextT>*  StateMachineBase<StateIdEnumT, ContextT>::StateBase::state_machine_ = nullptr;
+template<typename StateIdEnumT, class ContextT> ContextT* StateMachineBase<StateIdEnumT, ContextT>::StateBase::ctx_;
 
 // TODO: create a Dispatcher<Object>: public Looper {} to process msg/event asynchronously
 template<typename StateIdEnumT, typename EventIdEnumT, class ContextT>
-class EvStateMachineBase : public Looper, public enable_shared_from_this<EvStateMachineBase<StateIdEnumT, EventIdEnumT, ContextT> > {
+class EvStateMachineBase : public Looper {
 public:
 
     struct EventBase
@@ -126,13 +125,13 @@ public:
         friend class EvStateMachineBase<StateIdEnumT, EventIdEnumT, ContextT>;
 
     protected:
-        static shared_ptr<ContextT> ctx_;
+        static ContextT* ctx_;
 
     private:
         const string st_name;
         const StateIdEnumT st_id;
 
-        static shared_ptr<EvStateMachineBase<StateIdEnumT, EventIdEnumT, ContextT> > state_machine_;
+        static EvStateMachineBase<StateIdEnumT, EventIdEnumT, ContextT>* state_machine_;
     };
 
     EvStateMachineBase(string name): Looper(name), sm_name_(name), st_(nullptr) 
@@ -141,9 +140,9 @@ public:
     }
 
     // void Start(shared_ptr<StateBase> init_state, ContextT* ctx) 
-    void Start(shared_ptr<StateBase> init_state, shared_ptr<ContextT> ctx) 
+    void Start(shared_ptr<StateBase> init_state, ContextT* ctx) 
     {
-        StateBase::state_machine_ = this->shared_from_this();
+        StateBase::state_machine_ = this;
         StateBase::ctx_ = ctx; // shared_ptr<ContextT>(ctx);
         st_ = init_state;
         st_->ActionEntry();
@@ -153,7 +152,6 @@ public:
     {
         st_->ActionExit();
         st_.reset();
-        StateBase::ctx_.reset();
     }
 
     virtual ~EvStateMachineBase()
@@ -219,6 +217,6 @@ private:
 
     const string sm_name_;
 };
-template<typename StateIdEnumT, typename EventIdEnumT, class ContextT> shared_ptr<EvStateMachineBase<StateIdEnumT, EventIdEnumT, ContextT> > EvStateMachineBase<StateIdEnumT, EventIdEnumT, ContextT>::StateBase::state_machine_ = nullptr;
-template<typename StateIdEnumT, typename EventIdEnumT, class ContextT> shared_ptr<ContextT> EvStateMachineBase<StateIdEnumT, EventIdEnumT, ContextT>::StateBase::ctx_;
+template<typename StateIdEnumT, typename EventIdEnumT, class ContextT> EvStateMachineBase<StateIdEnumT, EventIdEnumT, ContextT>* EvStateMachineBase<StateIdEnumT, EventIdEnumT, ContextT>::StateBase::state_machine_ = nullptr;
+template<typename StateIdEnumT, typename EventIdEnumT, class ContextT> ContextT* EvStateMachineBase<StateIdEnumT, EventIdEnumT, ContextT>::StateBase::ctx_;
 

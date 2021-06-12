@@ -1,5 +1,7 @@
 #include "fsm.h"
-#include "messenger.h"
+#include "datatype/ids.h"
+#include "datatype/types.h"
+#include "msgbus.h"
 #include <iostream>
 
 using namespace std;
@@ -7,14 +9,7 @@ using namespace std;
 using ThreadPtr = shared_ptr<thread>;
 
 
-struct MsgA : public MsgBase {
-  int data;
-
-  MsgA(int d) : MsgBase(MsgId::MSG_A, "MSG_A"), data(d) {}
-};
-
-// TODO: Context should always inherit enable_shared_from_this, create class IStateContext for TestNode to inherit from
-class TestNode : public MsgHandler, public enable_shared_from_this<TestNode> {
+class TestNode : public MsgBus::Subscriber {
 public:
   enum class TestEventId
   {
@@ -82,7 +77,7 @@ public:
     int data;
   };
 
-  TestNode(): MsgHandler("test_node") {
+  TestNode(): MsgBus::Subscriber("test_node") {
     state_machine_ = make_shared<TestStateMachine>("test_node");
   }
 
@@ -90,7 +85,7 @@ public:
 
   void Activate() 
   {
-    state_machine_->Start(make_shared<IdleState>(), this->shared_from_this());
+    state_machine_->Start(make_shared<IdleState>(), this);
   }
 
   void Deactivate()
@@ -99,17 +94,18 @@ public:
   }
 
   // MsgHandler::ProcMsg
-  void ProcMsg(MsgBasePtr msg) override {
+  bool ProcMsg(MsgPtr msg) override {
     switch (msg->msg_id) {
-    case MsgId::MSG_A: {
-      shared_ptr<MsgA> msg_a = dynamic_pointer_cast<MsgA>(msg);
-      cout << msg_a->data << endl;
-      state_machine_->DispatchEvent(make_shared<EventA>(msg_a->data));
+    case DataType::SYS_INFO: {
+      shared_ptr<SysInfoMsg> msg_a = dynamic_pointer_cast<SysInfoMsg>(msg);
+      cout << msg_a->data.boot_cnt << endl;
+      state_machine_->DispatchEvent(make_shared<EventA>(msg_a->data.boot_cnt));
     } 
     break;
     default:
       cout << "ignore msg_type: " << msg->msg_name;
     }
+    return true;
   }
 
 private:
@@ -125,7 +121,7 @@ int main(int argc, char *argv[]) {
   while (true) {
     tn->Activate();
     for (int i = 0; i < 10; i++) {
-      tn->DispatchMsg(make_shared<MsgA>(k++));
+      tn->Dispatch(make_shared<SysInfoMsg>(SysInfo(true, k++)));
       this_thread::sleep_for(chrono::milliseconds(100));
     }
     tn->Deactivate();

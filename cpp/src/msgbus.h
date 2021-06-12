@@ -12,17 +12,17 @@ using namespace std;
 class MsgBus
 {
 public:
-    class Subscriber : public Dispatcher<MsgPtr>, public enable_shared_from_this<Subscriber>
+    class Subscriber : public Dispatcher<MsgPtr>
     {
     public:
         Subscriber(string name): Dispatcher(name + "_msgbus_sub") {}
 
-        void Subscribe(MsgId msg_id) {
-            MsgBus::Subscribe(msg_id, shared_from_this());
+        void Subscribe(DataId msg_id) {
+            MsgBus::Subscribe(msg_id, this);
         }
 
         void SubscribeAll() {
-            MsgBus::SubscribeAll(shared_from_this());
+            MsgBus::SubscribeAll(this);
         }
 
         virtual bool ProcMsg(MsgPtr msg) = 0;
@@ -32,7 +32,6 @@ public:
             return ProcMsg(msg);  
         }
     };
-    using SubscriberPtr = shared_ptr<Subscriber>;
 
     // TODO: add Publisher
     class Publisher
@@ -51,11 +50,11 @@ public:
 
     static void Publish(MsgPtr msg) { Instance().PubMsg(msg); }
 
-    static void Subscribe(MsgId msg_id, SubscriberPtr sub) {
+    static void Subscribe(DataId msg_id, Subscriber* sub) {
         Instance().SubMsg(msg_id, sub);
     }
 
-    static void SubscribeAll(SubscriberPtr sub) {
+    static void SubscribeAll(Subscriber* sub) {
         Instance().SubAll(sub);
     }
 
@@ -69,14 +68,14 @@ private:
         }
     }
 
-    void SubMsg(MsgId msg_id, SubscriberPtr sub) {
+    void SubMsg(DataId msg_id, Subscriber* sub) {
         id_subsribers_map_[msg_id].push_back(sub);
     }
 
-    void SubAll(SubscriberPtr sub) {
+    void SubAll(Subscriber* sub) {
         all_id_subsribers_.push_back(sub);
     }
 
-    unordered_map<MsgId, vector<SubscriberPtr> > id_subsribers_map_;
-    vector<SubscriberPtr> all_id_subsribers_;
+    unordered_map<DataId, vector<Subscriber*> > id_subsribers_map_;
+    vector<Subscriber*> all_id_subsribers_;
 };

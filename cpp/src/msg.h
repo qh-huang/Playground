@@ -4,25 +4,29 @@
 #include <string>
 #include <memory>
 
-using namespace std;
+#include "datatype/ids.h"
+#include "datatype/types.h"
 
-using MsgId = uint32_t;
+using namespace std;
 
 struct MsgBase
 {
-    const MsgId msg_id;
+    const DataId msg_id;
     const string msg_name;
 
-    MsgBase(MsgId id, string name): msg_id(id), msg_name(name) {}
+    MsgBase(DataId id, string name): msg_id(id), msg_name(name) {}
     virtual ~MsgBase() {}
 };
 using MsgPtr = shared_ptr<MsgBase>;
 
-#define DEFINE_MSG(TypeName, MSG_ID, data_member)                                   \
+#define DEFINE_MSG(TypeName, TYPE_ID)                                               \
 struct TypeName##Msg : public MsgBase {                                             \
-    TypeName data_member;                                                           \
-    TypeName##Msg(): MsgBase(MSG_ID, #MSG_ID) {}                                    \
-    TypeName##Msg(TypeName data): MsgBase(MSG_ID, #MSG_ID), data_member(data) {}    \
+    TypeName data;                                                                  \
+    TypeName##Msg(): MsgBase(DataType::TYPE_ID, #TYPE_ID) {}                        \
+    TypeName##Msg(TypeName d): MsgBase(DataType::TYPE_ID, #TYPE_ID), data(d) {}     \
 };                                                                                  \
-using TypeName##MsgPtr = shared_ptr<TypeName##Msg>;   
+using TypeName##MsgPtr = shared_ptr<TypeName##Msg>;
+// TODO: TypeName##Msg(...): MsgBase(DataType::TYPE_ID, #TYPE_ID), data(...) {} 
+
+DEFINE_MSG(SysInfo, SYS_INFO)
 
