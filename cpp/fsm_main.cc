@@ -95,7 +95,7 @@ public:
 
   // MsgHandler::ProcMsg
   bool ProcMsg(MsgPtr msg) override {
-    switch (msg->msg_id) {
+    switch (msg->data_id) {
     case DataType::SYS_INFO: {
       shared_ptr<SysInfoMsg> msg_a = dynamic_pointer_cast<SysInfoMsg>(msg);
       cout << msg_a->data.boot_cnt << endl;

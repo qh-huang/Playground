@@ -17,8 +17,8 @@ public:
     public:
         Subscriber(string name): Dispatcher(name + "_msgbus_sub") {}
 
-        void Subscribe(DataId msg_id) {
-            MsgBus::Subscribe(msg_id, this);
+        void Subscribe(DataId data_id) {
+            MsgBus::Subscribe(data_id, this);
         }
 
         void SubscribeAll() {
@@ -50,8 +50,8 @@ public:
 
     static void Publish(MsgPtr msg) { Instance().PubMsg(msg); }
 
-    static void Subscribe(DataId msg_id, Subscriber* sub) {
-        Instance().SubMsg(msg_id, sub);
+    static void Subscribe(DataId data_id, Subscriber* sub) {
+        Instance().SubMsg(data_id, sub);
     }
 
     static void SubscribeAll(Subscriber* sub) {
@@ -60,7 +60,7 @@ public:
 
 private:
     void PubMsg(MsgPtr msg) {
-        for (auto sub : id_subsribers_map_[msg->msg_id]) {
+        for (auto sub : id_subsribers_map_[msg->data_id]) {
             sub->Dispatch(msg);
         }
         for (auto sub : all_id_subsribers_) {
@@ -68,8 +68,8 @@ private:
         }
     }
 
-    void SubMsg(DataId msg_id, Subscriber* sub) {
-        id_subsribers_map_[msg_id].push_back(sub);
+    void SubMsg(DataId data_id, Subscriber* sub) {
+        id_subsribers_map_[data_id].push_back(sub);
     }
 
     void SubAll(Subscriber* sub) {

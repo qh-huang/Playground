@@ -13,9 +13,9 @@ namespace MsgId
 
 struct MsgBase {
   const string msg_name;
-  const MsgIdType msg_id;
+  const MsgIdType data_id;
 
-  MsgBase(MsgIdType id, string name) : msg_id(id), msg_name(name) {}
+  MsgBase(MsgIdType id, string name) : data_id(id), msg_name(name) {}
   virtual ~MsgBase() {}
 };
 using MsgBasePtr = shared_ptr<MsgBase>;

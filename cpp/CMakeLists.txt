@@ -47,3 +47,8 @@ target_link_libraries(spinner_main pthread)
 add_executable(msg_main msg_main.cc)
 target_link_libraries(msg_main mycpp)
 
+add_executable(dshbrd_main dshbrd_main.cc)
+target_link_libraries(dshbrd_main mycpp)
+
+
+

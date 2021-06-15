@@ -25,7 +25,7 @@ class WeatherMan : public MsgBus::Subscriber
 public:
     WeatherMan(): MsgBus::Subscriber("weatherman") {}
     bool ProcMsg(MsgPtr msg) {
-        if (msg->msg_id == DataType::WEATHER_INFO) {
+        if (msg->data_id == DataType::WEATHER_INFO) {
             // WeatherInfoMsgPtr wmp = dynamic_pointer_cast<WeatherInfoMsgPtr>(msg);
             shared_ptr<WeatherInfoMsg> wmp = dynamic_pointer_cast<WeatherInfoMsg>(msg);
             cout << "temperature: " << wmp->data.temperature << endl;
@@ -47,7 +47,7 @@ public:
     }
 
     bool ProcMsg(MsgPtr msg) {
-        if (msg->msg_id == DataType::STOCK_INFO) {
+        if (msg->data_id == DataType::STOCK_INFO) {
             // WeatherInfoMsgPtr wmp = dynamic_pointer_cast<WeatherInfoMsgPtr>(msg);
             StockInfoMsgPtr sp = dynamic_pointer_cast<StockInfoMsg>(msg);
             cout << "stock id: " << sp->data.stock_id << endl;

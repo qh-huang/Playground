@@ -11,10 +11,10 @@ using namespace std;
 
 struct MsgBase
 {
-    const DataId msg_id;
+    const DataId data_id;
     const string msg_name;
 
-    MsgBase(DataId id, string name): msg_id(id), msg_name(name) {}
+    MsgBase(DataId id, string name): data_id(id), msg_name(name) {}
     virtual ~MsgBase() {}
 };
 using MsgPtr = shared_ptr<MsgBase>;
