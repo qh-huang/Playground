@@ -43,10 +43,6 @@ public:
         }
     };
 
-    static MsgBus& Instance() {
-        static MsgBus inst;
-        return inst;
-    }
 
     static void Publish(MsgPtr msg) { Instance().PubMsg(msg); }
 
@@ -59,6 +55,11 @@ public:
     }
 
 private:
+    static MsgBus& Instance() {
+        static MsgBus inst;
+        return inst;
+    }
+
     void PubMsg(MsgPtr msg) {
         for (auto sub : id_subsribers_map_[msg->data_id]) {
             sub->Dispatch(msg);

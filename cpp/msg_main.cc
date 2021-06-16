@@ -12,6 +12,7 @@ struct StockInfo
     double price;
 };
 
+// for demo purpose only. start from 0x F000 0000 to avoid confliction against the library
 namespace DataType {
     constexpr DataId WEATHER_INFO = 0x0F0000001;
     constexpr DataId STOCK_INFO = 0x0F0000002;
@@ -26,7 +27,6 @@ public:
     WeatherMan(): MsgBus::Subscriber("weatherman") {}
     bool ProcMsg(MsgPtr msg) {
         if (msg->data_id == DataType::WEATHER_INFO) {
-            // WeatherInfoMsgPtr wmp = dynamic_pointer_cast<WeatherInfoMsgPtr>(msg);
             shared_ptr<WeatherInfoMsg> wmp = dynamic_pointer_cast<WeatherInfoMsg>(msg);
             cout << "temperature: " << wmp->data.temperature << endl;
             cout << "humidity: " << wmp->data.humidity << endl;
@@ -41,6 +41,9 @@ class StockTrader : public MsgBus::Subscriber
 {
 public:
     StockTrader(): MsgBus::Subscriber("stock_trader") {}
+
+    // if additional tasks need to be done before activation,
+    // override Activate (or just do it in constructor)
     void Activate() {
         Subscribe(DataType::STOCK_INFO);
         Subscriber::Activate();
@@ -48,7 +51,6 @@ public:
 
     bool ProcMsg(MsgPtr msg) {
         if (msg->data_id == DataType::STOCK_INFO) {
-            // WeatherInfoMsgPtr wmp = dynamic_pointer_cast<WeatherInfoMsgPtr>(msg);
             StockInfoMsgPtr sp = dynamic_pointer_cast<StockInfoMsg>(msg);
             cout << "stock id: " << sp->data.stock_id << endl;
             cout << "stock price: " << sp->data.price << endl;
@@ -79,7 +81,25 @@ public:
     }
 };
 
+class StockInfoBroadcaster : public Looper, public MsgBus::Publisher
+{
+public:
+    StockInfoBroadcaster() : Looper("stock_brdcst", 1000) {}
 
+    void SpinOnce() override {
+        static int stock_id = 1;
+        static double price = 10.3;
+        StockInfoMsgPtr sp = make_shared<StockInfoMsg>();
+        sp->data.stock_id = stock_id;
+        sp->data.price = price;
+        price += 0.7;
+        Publish(sp);
+    }
+
+    bool WaitCondition() override {
+        return true;
+    }
+};
 
 int main(int argc, char* argv[])
 {
@@ -95,20 +115,23 @@ int main(int argc, char* argv[])
     StockInfoMsgPtr si_ptr = make_shared<StockInfoMsg>(si);
 
     shared_ptr<WeatherMan> wm = make_shared<WeatherMan>();
-    wm->Subscribe(DataType::WEATHER_INFO);
-    wm->Activate();
-    // MsgBus::Subscribe(WEATHER_INFO, wm);
+    wm->Subscribe(DataType::WEATHER_INFO); // subsciption done here in caller's context
+    wm->Activate(); // this is Looper::Activate(), not overrided by WeatherMan
 
     shared_ptr<StockTrader> stock_trader = make_shared<StockTrader>();
-    stock_trader->Activate();
+    stock_trader->Activate(); // subscription done in StockTrader::Activate()
 
     // this_thread::sleep_for(std::chrono::milliseconds(2000));
 
+    // example of publishing by calling MsgBus::Publish
     MsgBus::Publish(wp);
     MsgBus::Publish(si_ptr);
 
+    // example of publishing by MsgBus::Publisher
     WeatherInfoBroadcaster wb;
+    StockInfoBroadcaster sb;
     wb.Activate();
+    sb.Activate();
 
     int i;
     cin >> i;

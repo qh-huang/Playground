@@ -5,6 +5,19 @@
 
 using namespace std;
 
+#define DEFINE_PRINT_FUNC_BEGIN(TypeName) \
+    void Print(TypeName d) { \
+        cout << "+++++ " << #TypeName << " +++++" << endl; 
+
+#define PRINT_VAL(data) \
+        do { \
+            cout << "\t" << #data << " (" << d.data << ")" << endl; \
+        } while (0);
+
+#define DEFINE_PRINT_FUNC_END(TypeName) \
+        cout << "----- " << #TypeName << " -----" << endl; \
+    }
+
 struct SysInfo 
 {
     bool boot_cnt_loaded;
@@ -14,6 +27,12 @@ struct SysInfo
         boot_cnt(bc) 
         {}
 };
+
+DEFINE_PRINT_FUNC_BEGIN(SysInfo)
+    PRINT_VAL(boot_cnt_loaded)
+    PRINT_VAL(boot_cnt)
+DEFINE_PRINT_FUNC_END(SysInfo)
+
 
 struct PowerStatus
 {
@@ -28,3 +47,8 @@ struct PowerStatus
         {}
 };
 
+DEFINE_PRINT_FUNC_BEGIN(PowerStatus)
+    PRINT_VAL(is_charging)
+    PRINT_VAL(remain_time_mins)
+    PRINT_VAL(temperature_deg)
+DEFINE_PRINT_FUNC_END(PowerStatus)
