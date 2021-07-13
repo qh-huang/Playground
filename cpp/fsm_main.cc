@@ -22,17 +22,17 @@ public:
       START
   };
 
-  using TestStateMachine = EvStateMachineBase<TestStateId, TestEventId, TestNode>;  
+  using TestStateMachine = EvStateMachineBase<TestStateId, TestEventId>;  
 
   struct EventA : public TestStateMachine::EventBase {
     int data;
     EventA(int d) : EventBase(TestEventId::A, "EV_A"), data(d) {}
   };
 
-  class IdleState : public TestStateMachine::StateBase
+  class IdleState : public TestStateMachine::EvStateBase
   {
   public:
-    IdleState() : StateBase(TestStateId::IDLE, "IDLE") {}
+    IdleState() : EvStateBase(TestStateId::IDLE, "IDLE") {}
     void OnEvent(shared_ptr<TestStateMachine::EventBase> ev) override {
       switch (ev->ev_id) {
       case TestEventId::A: {
@@ -52,10 +52,10 @@ public:
     void ActionExit() override { cout << "exiting IdleState" << endl; }
   };
 
-  class StartState : public TestStateMachine::StateBase
+  class StartState : public TestStateMachine::EvStateBase
   {
   public:
-    StartState(int d) : StateBase(TestStateId::START, "START"), data(d) {}
+    StartState(int d) : EvStateBase(TestStateId::START, "START"), data(d) {}
     void OnEvent(std::shared_ptr<TestStateMachine::EventBase> ev) override {
       switch (ev->ev_id) {
       case TestEventId::A: {
@@ -85,7 +85,7 @@ public:
 
   void Activate() 
   {
-    state_machine_->Start(make_shared<IdleState>(), this);
+    state_machine_->Start(make_shared<IdleState>());
   }
 
   void Deactivate()
@@ -99,7 +99,7 @@ public:
     case DataType::SYS_INFO: {
       shared_ptr<SysInfoMsg> msg_a = dynamic_pointer_cast<SysInfoMsg>(msg);
       cout << msg_a->data.boot_cnt << endl;
-      state_machine_->DispatchEvent(make_shared<EventA>(msg_a->data.boot_cnt));
+      state_machine_->EmitEvent(make_shared<EventA>(msg_a->data.boot_cnt));
     } 
     break;
     default:
