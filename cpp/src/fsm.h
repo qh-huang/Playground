@@ -22,13 +22,8 @@ public:
 
         void TransitTo(shared_ptr<StateBase> st) 
         {
-            if (!state_machine_) {
-                cerr << "state_machine_ is null" << endl;
-                return;
-            } 
-
             cout << "state transition: " << GetName() << " ==> " << st->GetName() << endl;
-            state_machine_->TransitTo(st);        
+            state_machine_->TransitTo(st);
         }
 
         friend class StateMachineBase<StateIdEnumT>;
@@ -39,11 +34,12 @@ public:
         const StateIdEnumT st_id;
     };
 
-    StateMachineBase(string name): sm_name_(name), st_(nullptr) {}
+    StateMachineBase(string name): st_(nullptr) {
+        StateBase::state_machine_ = this;
+    }
 
     void Start(shared_ptr<StateBase> init_state) 
     {
-        StateBase::state_machine_ = this;
         st_ = init_state;
         st_->ActionEntry();
     }
@@ -72,7 +68,6 @@ public:
     shared_ptr<StateBase> GetState() { return st_; }
 protected:
     shared_ptr<StateBase> st_;
-    const string sm_name_;
 };
 template<typename StateIdEnumT> StateMachineBase<StateIdEnumT>*  StateMachineBase<StateIdEnumT>::StateBase::state_machine_ = nullptr;
 
@@ -102,10 +97,6 @@ public:
     public:
         EvHandler(string name, EvStateMachineBase* state_machine): Dispatcher<shared_ptr<EventBase> >(name + "_ev_handler"), state_machine_(state_machine) {}
         bool Process(shared_ptr<EventBase> ev) {
-            if (state_machine_ == NULL) {
-                cerr << "state_machine is null" << endl;
-                return false;
-            }
             auto st = state_machine_->GetState();
             if (!st) {
                 cerr << "st is null" << endl;
@@ -119,9 +110,9 @@ public:
         EvStateMachineBase* state_machine_;
     };
 
-    EvStateMachineBase(string name): StateMachineBase<StateIdEnumT>(name) 
+    EvStateMachineBase(string name): StateMachineBase<StateIdEnumT>(name), ev_handler_(name, this)
     {
-        ev_handler_ = make_shared<EvHandler>(name, this);
+        // ev_handler_ = make_shared<EvHandler>(name, this);
     }
 
     virtual ~EvStateMachineBase() = default;
@@ -129,16 +120,7 @@ public:
     void EmitEvent(shared_ptr<EventBase> ev) 
     {
         cout << "emitting event: " << ev->ev_name << endl;
-        ev_handler_->Dispatch(ev);
-    }
-
-    void ProcessEvent(shared_ptr<EventBase> ev) {
-        auto st = GetState();
-        if (!st) {
-            cerr << "st_ is null" << endl;
-            return;
-        } 
-        st->OnEvent(ev);
+        ev_handler_.Dispatch(ev);
     }
 
     shared_ptr<EvStateBase> GetState() {
@@ -150,8 +132,6 @@ public:
     }
 
 private:
-    // shared_ptr<EvStateBase> st_;
-    shared_ptr<EvHandler> ev_handler_;
-    const string sm_name_;
+    EvHandler ev_handler_;
 };
 
