@@ -19,14 +19,14 @@ struct MsgBase
 };
 using MsgPtr = shared_ptr<MsgBase>;
 
-#define DEFINE_MSG(TypeName, TYPE_ID)                                               \
-struct TypeName##Msg : public MsgBase {                                             \
-    TypeName data;                                                                  \
-    TypeName##Msg(): MsgBase(DataType::TYPE_ID, #TYPE_ID) {}                        \
-    TypeName##Msg(TypeName d): MsgBase(DataType::TYPE_ID, #TYPE_ID), data(d) {}     \
+#define DEFINE_MSG(Type, TYPE_ID)                                               \
+struct Type##Msg : public MsgBase {                                             \
+    Type data;                                                                  \
+    Type##Msg(): MsgBase(DataType::TYPE_ID, #TYPE_ID) {}                        \
+    Type##Msg(Type d): MsgBase(DataType::TYPE_ID, #TYPE_ID), data(d) {}     \
 };                                                                                  \
-using TypeName##MsgPtr = shared_ptr<TypeName##Msg>;
-// TODO: TypeName##Msg(...): MsgBase(DataType::TYPE_ID, #TYPE_ID), data(...) {} 
+using Type##MsgPtr = shared_ptr<Type##Msg>;
+// TODO: Type##Msg(...): MsgBase(DataType::TYPE_ID, #TYPE_ID), data(...) {} 
 
 DEFINE_MSG(SysInfo, SYS_INFO)
 
