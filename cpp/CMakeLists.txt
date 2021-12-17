@@ -50,5 +50,9 @@ target_link_libraries(msg_main mycpp)
 add_executable(dshbrd_main dshbrd_main.cc)
 target_link_libraries(dshbrd_main mycpp)
 
+add_executable(timer_main timer_main.cc)
+target_link_libraries(timer_main mycpp)
 
+add_executable(container_main container_main.cc)
 
+add_executable(multi_inherit_main multi_inherit_main.cc)
