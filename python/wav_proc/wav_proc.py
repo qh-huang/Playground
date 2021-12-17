@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from scipy.io.wavfile import read
-from scipy.fftpack import fft
+from scipy.fftpack import fft,fftfreq
 from scipy.io import wavfile # get the api
 import matplotlib.pyplot as plt
 import numpy as np
@@ -20,9 +20,12 @@ ax = plt.gca() # get current axes
 ax.set_xlim([2600, 2625])
 ax.set_ylim([None, 1500])
 # plt.title('169A-Y582523-202110120957ALU.WAV');
-plt.plot(abs(c[:(d-1)]),'b') 
+xf = fftfreq(len(data), 1/fs)[:len(data)//2]
+plt.plot(xf, abs(c[:(d-1)]),'b') 
+
 # plt.show()
 # plt.figure();
+
 
 # plt.figure();
 fs, data = wavfile.read('./../datasets/167A-Y582523-202110120956-RU.WAV') # load the data
@@ -155,16 +158,16 @@ plt.figure();
 
 
 # read audio samples
-input_data = read("./../datasets/169A-Y582523-202110120957ALU.WAV")
-audio = input_data[1]
-# plot the first 1024 samples
-# plt.plot(audio[0:1024])
-plt.plot(audio[0:])
-# label the axes
-plt.ylabel("Amplitude")
-plt.xlabel("Time")
-# set the title  
-plt.title("169A-Y582523-202110120957ALU.WAV")
+# input_data = read("./../datasets/169A-Y582523-202110120957ALU.WAV")
+# audio = input_data[1]
+# # plot the first 1024 samples
+# # plt.plot(audio[0:1024])
+# plt.plot(audio[0:])
+# # label the axes
+# plt.ylabel("Amplitude")
+# plt.xlabel("Time")
+# # set the title  
+# plt.title("169A-Y582523-202110120957ALU.WAV")
 # display the plot
 plt.show()
 
