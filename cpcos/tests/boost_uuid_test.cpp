@@ -1,6 +1,6 @@
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
-#include <boost/detail/lightweight_test.hpp>
+// #include <boost/detail/lightweight_test.hpp>
 #include <gtest/gtest.h>
 
 class object

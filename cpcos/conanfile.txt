@@ -3,7 +3,7 @@ abseil/20211102.0
 boost/1.78.0
 ceres-solver/2.0.0
 # build break @docker(conanio/gcc7-armv7)
-# cryptopp/8.5.0
+cryptopp/8.5.0
 eigen/3.4.0
 expat/2.4.3 # to fix dependencies conflict between poco and dbus
 dbus/1.12.20
@@ -14,26 +14,26 @@ fmt/8.1.1
 grpc/1.43.0
 gtest/1.11.0
 libcurl/7.80.0
-#mosquitto/2.0.14
+mosquitto/2.0.14
 nlohmann_json/3.10.5
 opencv/4.5.3
-openssl/3.0.1 # conflict with cmake after including folly?
-# openssl/1.1.1m
+openssl/3.0.1
 paho-mqtt-cpp/1.2.0
 poco/1.11.1
 protobuf/3.19.2
 sophus/1.0.0
 spdlog/1.9.2
-#zstd/1.5.2
+zeromq/4.3.4
+zstd/1.5.2
 
 [generators]
 cmake
 
 [options]
+boost:header_only=True
 boost:without_test=True
 opencv:with_ffmpeg=False
 opencv:dnn=False
 poco:enable_data_mysql=False
 poco:enable_data_postgresql=False
 poco:enable_data_sqlite=False
-

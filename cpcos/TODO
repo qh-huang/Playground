@@ -1,0 +1,8 @@
+- write examples for:
+    1. flatbuffer
+    2. asynchronous http client
+    3. uart class based on boost.asio
+    4. lock-free object based on boost or abseil
+- apply CI
+- script for static analysis
+- script to build and run docker image
