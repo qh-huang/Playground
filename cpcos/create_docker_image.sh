@@ -15,5 +15,7 @@ CONANFILE_CRC32=$(crc32 ${PROEJCT_ROOT}/conanfile.txt)
 echo "crc32 of conanfile: ${CONANFILE_CRC32}"
 
 docker build \
-    --no-cache=true \
-    --build-arg CONANFILE_CRC32=$(crc32 conanfile.txt) -t cpcop -f Dockerfile .
+    --build-arg CONANFILE_CRC32=$(crc32 conanfile.txt) \
+    -t cpcos \
+    -f Dockerfile \
+    .
