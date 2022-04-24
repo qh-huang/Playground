@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <iostream>
 #include <memory>
+#include <array>
 
 #define DISPLAY_FUNC_NAME                                                      \
   do {                                                                         \
